@@ -44,7 +44,7 @@ class GwtTest {
         }.WHEN {
             given.length
         }.ASSERT {
-            assertThat(result)
+            assertThat(actual)
                 .isEqualTo(8)
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 XpathQs
+ * Copyright (c) 2021 Xpath-Qs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 package org.xpathqs.gwt
 
+import assertk.assertAll
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 
@@ -33,20 +34,23 @@ class GIVEN<G>(f: () -> G) {
     }
 }
 
-fun<W> WHEN(f: GIVEN<String>.()->W): When<String, W> {
-    val given = GIVEN { "" }
-    return When(given, f)
-}
-
 class When<G, W>(given: GIVEN<G>, f: GIVEN<G>.() -> W) {
-    val result: W = given.f()
+    val actual: W = given.f()
+    val given: G = given.given
 
     fun THEN(f: When<G, W>.()->W) {
-        assertThat(result)
+        assertThat(actual)
             .isEqualTo(this.f())
     }
 
     fun ASSERT(f: When<G, W>.()->Unit) {
-        this.f()
+        assertAll {
+            this.f()
+        }
     }
+}
+
+fun<W> WHEN(f: GIVEN<String>.()->W): When<String, W> {
+    val given = GIVEN { "" }
+    return When(given, f)
 }
