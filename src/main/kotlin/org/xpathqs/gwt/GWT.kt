@@ -38,15 +38,22 @@ class When<G, W>(given: GIVEN<G>, f: GIVEN<G>.() -> W) {
     val actual: W = given.f()
     val given: G = given.given
 
-    fun THEN(f: When<G, W>.()->W) {
+    fun THEN(f: When<G, W>.()->W): When<G, W> {
         assertThat(actual)
             .isEqualTo(this.f())
+        return this
     }
 
-    fun ASSERT(f: When<G, W>.()->Unit) {
+    fun ASSERT(f: When<G, W>.()->Unit): When<G, W> {
         assertAll {
             this.f()
         }
+        return this
+    }
+
+    fun AFTER(f: When<G, W>.()->Unit): When<G, W> {
+        this.f()
+        return this
     }
 }
 
