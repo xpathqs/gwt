@@ -22,48 +22,10 @@
 
 package org.xpathqs.gwt
 
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+interface IGwtAssert {
+    fun equals(actual: Any?, expected: Any?)
 
-class GwtTest {
-
-    init {
-        Notifier.assert = GwtAssertImpl()
-    }
-
-    @Test
-    fun gwt_example() {
-        GIVEN {
-            "a string"
-        }.WHEN {
-            given.length
-        }.THEN(8)
-    }
-
-    @Test
-    fun gwt_with_log_example() {
-        GIVEN("A String of '8' chars") {
-            "a string"
-        }.WHEN("Calling a length") {
-            given.length
-        }.THEN("It Should return '8'", 0)
-    }
-
-    @Test
-    fun gwt_assert_example() {
-        GIVEN {
-            "a string"
-        }.WHEN {
-            given.length
-        }.THEN {
-            assertEquals(actual, 8)
-        }
-    }
-
-    @Test
-    fun noGiven_example() {
-        WHEN {
-            "str".length
-        }.THEN(3)
+    fun assertAll(f: () -> Unit) {
+        f()
     }
 }

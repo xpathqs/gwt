@@ -2,10 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = "org.xpathqs"
-version = "0.1.1"
+version = "0.1.2"
 
 plugins {
-    kotlin("jvm") version "1.5.0"
+    kotlin("jvm") version "1.3.71"
     id("org.jetbrains.dokka") version "1.4.32"
     `java-library`
     jacoco
@@ -32,7 +32,6 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("com.willowtreeapps.assertk:assertk-jvm:0.23.1")
 
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")

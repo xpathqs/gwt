@@ -22,48 +22,17 @@
 
 package org.xpathqs.gwt
 
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import org.xpathqs.gwt.log.ConsoleLog
+import org.xpathqs.gwt.log.IGwtLog
+import org.xpathqs.gwt.log.IGwtLogLambda
+import org.xpathqs.gwt.log.NoLambdaLog
 
-class GwtTest {
+object Notifier {
+    var log: IGwtLog = ConsoleLog()
+    var lambdaLog: IGwtLogLambda = NoLambdaLog()
+    lateinit var assert: IGwtAssert
 
-    init {
-        Notifier.assert = GwtAssertImpl()
-    }
+    val useLambdaLog: Boolean
+        get() = lambdaLog !is NoLambdaLog
 
-    @Test
-    fun gwt_example() {
-        GIVEN {
-            "a string"
-        }.WHEN {
-            given.length
-        }.THEN(8)
-    }
-
-    @Test
-    fun gwt_with_log_example() {
-        GIVEN("A String of '8' chars") {
-            "a string"
-        }.WHEN("Calling a length") {
-            given.length
-        }.THEN("It Should return '8'", 0)
-    }
-
-    @Test
-    fun gwt_assert_example() {
-        GIVEN {
-            "a string"
-        }.WHEN {
-            given.length
-        }.THEN {
-            assertEquals(actual, 8)
-        }
-    }
-
-    @Test
-    fun noGiven_example() {
-        WHEN {
-            "str".length
-        }.THEN(3)
-    }
 }
