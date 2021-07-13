@@ -27,10 +27,6 @@ import kotlin.test.assertEquals
 
 class GwtTest {
 
-    init {
-        Notifier.assert = GwtAssertImpl()
-    }
-
     @Test
     fun gwt_example() {
         GIVEN {
@@ -46,7 +42,7 @@ class GwtTest {
             "a string"
         }.WHEN("Calling a length") {
             given.length
-        }.THEN("It Should return '8'", 0)
+        }.THEN("It Should return '8'", 8)
     }
 
     @Test

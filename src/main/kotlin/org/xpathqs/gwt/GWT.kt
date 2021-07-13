@@ -22,65 +22,63 @@
 
 package org.xpathqs.gwt
 
-class GIVEN<G> {
+import org.xpathqs.gwt.GIVEN.Companion.gwtAssert
+import org.xpathqs.gwt.GIVEN.Companion.log
+import org.xpathqs.log.BaseLogger
+import org.xpathqs.log.message.IMessage
+import org.xpathqs.log.message.tag
+import org.xpathqs.log.style.StyledString
+
+open class GIVEN<G> {
     val given: G
 
-    constructor(msg: String, f: () -> G)  {
-        given = if(Notifier.useLambdaLog) {
-            Notifier.lambdaLog.onGiven(msg, f) as G
+    constructor(msg: String, f: () -> G): this(StyledString(msg), f)
+    constructor(msg: StyledString, f: () -> G)  {
+        given = if(msg.toString().isNotEmpty()) {
+            log.action(msg, GIVEN, f)
         } else {
-            Notifier.log.onGiven(msg)
             f()
         }
     }
     constructor(f: () -> G): this("", f)
 
-    fun<W> WHEN(msg: String, f: GIVEN<G>.()->W) : When<G, W> {
-        return if(Notifier.useLambdaLog) {
-            When(
-                this.given,
-                Notifier.lambdaLog.onWhen(msg) {
-                    f()
-                } as W
-            )
-        } else {
-            Notifier.log.onWhen(msg)
-            When(this.given, f())
-        }
+    fun<W> WHEN(msg: String, f: GIVEN<G>.()->W) = WHEN(StyledString(msg), f)
+    fun<W> WHEN(msg: StyledString, f: GIVEN<G>.()->W) : When<G, W> {
+        return When(
+            given,
+            log.action(msg, WHEN) {
+                f()
+            }
+        )
     }
     fun<W> WHEN(f: GIVEN<G>.()->W) = WHEN("", f)
+
+    companion object {
+        var log: BaseLogger = BaseLogger()
+        var gwtAssert: IGwtAssert = GwtAssertImpl()
+
+        const val GIVEN = "GIVEN"
+        const val WHEN = "WHEN"
+        const val THEN = "THEN"
+    }
 }
 
-class When<G, W>(val given: G, val actual: W) {
+open class When<G, W>(val given: G, val actual: W) {
     fun THEN(expected: W) = THEN("", expected)
-    fun THEN(msg: String, expected: W): When<G, W> {
-        if(Notifier.useLambdaLog) {
-            Notifier.lambdaLog.onThen(msg) {
-                Notifier.assert.equals(actual, expected)
-            }
-        } else {
-            Notifier.log.onThen(msg)
-            Notifier.assert.equals(actual, expected)
+    fun THEN(msg: String, expected: W) = THEN(StyledString(msg), expected)
+    fun THEN(msg: StyledString, expected: W): When<G, W> {
+        log.action(msg, GIVEN.THEN) {
+            gwtAssert.equals(actual, expected)
         }
-
         return this
     }
 
     fun THEN(f: When<G, W>.()->Unit) = THEN("", f)
-    fun THEN(msg: String, f: When<G, W>.()->Unit): When<G, W> {
-        if(Notifier.useLambdaLog) {
-            Notifier.assert.assertAll {
-                Notifier.lambdaLog.onThen(msg) {
-                    f()
-                }
-            }
-        } else {
-            Notifier.log.onThen(msg)
-            Notifier.assert.assertAll {
-                f()
-            }
+    fun THEN(msg: String, f: When<G, W>.()->Unit) = THEN(StyledString(msg), f)
+    fun THEN(msg: StyledString, f: When<G, W>.()->Unit): When<G, W> {
+        log.action(msg, GIVEN.THEN) {
+            f()
         }
-
         return this
     }
 
@@ -90,16 +88,22 @@ class When<G, W>(val given: G, val actual: W) {
     }
 }
 fun<W> WHEN(f: GIVEN<String>.()->W) = WHEN("", f)
-fun<W> WHEN(msg: String, f: GIVEN<String>.()->W): When<String, W> {
+fun<W> WHEN(msg: String, f: GIVEN<String>.()->W) = WHEN(StyledString(msg), f)
+fun<W> WHEN(msg: StyledString, f: GIVEN<String>.()->W): When<String, W> {
     val given = GIVEN { "" }
-
-    return if(Notifier.useLambdaLog) {
-        When(given.given, Notifier.lambdaLog.onWhen(msg) {
+    return When(
+        given.given,
+        log.action(msg, GIVEN.WHEN) {
             given.f()
-        } as W)
-    } else {
-        Notifier.log.onWhen(msg)
-        When(given.given, given.f())
-    }
-
+        }
+    )
 }
+
+val IMessage.isThen: Boolean
+    get() = this.tag == GIVEN.THEN
+
+val IMessage.isWhen: Boolean
+    get() = this.tag == GIVEN.WHEN
+
+val IMessage.isGiven: Boolean
+    get() = this.tag == GIVEN.GIVEN

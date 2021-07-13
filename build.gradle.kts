@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = "org.xpathqs"
-version = "0.1.2"
+version = "0.2.0"
 
 plugins {
     kotlin("jvm") version "1.3.71"
@@ -28,12 +28,15 @@ jacoco {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
 
-    testImplementation(kotlin("test-junit5"))
+    implementation("org.xpathqs:log:0.1.1")
+
+    implementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
 }
