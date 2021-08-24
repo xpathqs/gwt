@@ -64,28 +64,7 @@ open class GIVEN<G> {
 }
 
 open class When<G, W>(val given: G, val actual: W) {
-    fun THEN(expected: W) = THEN("", expected)
-    fun THEN(msg: String, expected: W) = THEN(StyledString(msg), expected)
-    fun THEN(msg: StyledString, expected: W): When<G, W> {
-        log.action(msg, GIVEN.THEN) {
-            gwtAssert.equals(actual, expected)
-        }
-        return this
-    }
 
-    fun THEN(f: When<G, W>.()->Unit) = THEN("", f)
-    fun THEN(msg: String, f: When<G, W>.()->Unit) = THEN(StyledString(msg), f)
-    fun THEN(msg: StyledString, f: When<G, W>.()->Unit): When<G, W> {
-        log.action(msg, GIVEN.THEN) {
-            f()
-        }
-        return this
-    }
-
-    fun AFTER(f: When<G, W>.()->Unit): When<G, W> {
-        this.f()
-        return this
-    }
 }
 fun<W> WHEN(f: GIVEN<String>.()->W) = WHEN("", f)
 fun<W> WHEN(msg: String, f: GIVEN<String>.()->W) = WHEN(StyledString(msg), f)
