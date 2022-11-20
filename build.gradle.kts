@@ -2,10 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = "org.xpathqs"
-version = "0.2.1"
+version = "0.2.3"
 
 plugins {
-    kotlin("jvm") version "1.3.71"
+    kotlin("jvm") version "1.6.0"
     id("org.jetbrains.dokka") version "1.4.32"
     `java-library`
     jacoco
@@ -76,6 +76,7 @@ publishing {
             from(components["java"])
         }
     }
+
     repositories {
         maven {
             val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")

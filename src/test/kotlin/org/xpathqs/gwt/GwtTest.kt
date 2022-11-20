@@ -62,4 +62,13 @@ class GwtTest {
             "str".length
         }.THEN(3)
     }
+
+    @Test
+    fun noGiven_example_withCustomAssert() {
+        WHEN {
+            "str".length
+        }.THEN("Check Length") {
+            assertEquals(actual, 3)
+        }
+    }
 }

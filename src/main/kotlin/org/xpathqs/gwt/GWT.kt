@@ -22,38 +22,36 @@
 
 package org.xpathqs.gwt
 
-import org.xpathqs.gwt.GIVEN.Companion.gwtAssert
 import org.xpathqs.gwt.GIVEN.Companion.log
+import org.xpathqs.gwt.GIVEN.Companion.logEvaluator
 import org.xpathqs.log.BaseLogger
 import org.xpathqs.log.message.IMessage
 import org.xpathqs.log.message.tag
 import org.xpathqs.log.style.StyledString
 
-open class GIVEN<G> {
-    val given: G
+open class GIVEN<G: Any> {
+    lateinit var given: G
 
+    constructor(msg: String, f: G): this(msg, {f})
     constructor(msg: String, f: () -> G): this(StyledString(msg), f)
     constructor(msg: StyledString, f: () -> G)  {
-        given = if(msg.toString().isNotEmpty()) {
-            log.action(msg, GIVEN, f)
-        } else {
-            f()
-        }
+        logEvaluator.GIVEN(msg, this, f)
     }
     constructor(f: () -> G): this("", f)
+
 
     fun<W> WHEN(msg: String, f: GIVEN<G>.()->W) = WHEN(StyledString(msg), f)
     fun<W> WHEN(msg: StyledString, f: GIVEN<G>.()->W) : When<G, W> {
         return When(
             given,
-            log.action(msg, WHEN) {
-                f()
-            }
+            logEvaluator.WHEN(msg, this, f)
         )
+
     }
     fun<W> WHEN(f: GIVEN<G>.()->W) = WHEN("", f)
 
     companion object {
+        var logEvaluator: ILogEvaluate = LogEvaluateImpl()
         var log: BaseLogger = BaseLogger()
         var gwtAssert: IGwtAssert = GwtAssertImpl()
 
@@ -63,18 +61,41 @@ open class GIVEN<G> {
     }
 }
 
-open class When<G, W>(val given: G, val actual: W) {
+open class When<G: Any, W>(val given: G, val actual: W) {
 
+    open fun<W:Any> THEN(expected: W) = THEN("", expected)
+    open fun<W:Any> THEN(msg: String, expected: W) = THEN(StyledString(msg), expected)
+    open fun<W:Any> THEN(msg: StyledString, expected: W): When<G, W> {
+        log.action(msg, GIVEN.THEN) {
+            GIVEN.gwtAssert.equals(actual, expected)
+        }
+        return this as When<G, W>
+    }
+
+    open fun THEN(f: When<G, W>.()->Unit) = THEN("", f)
+    open fun THEN(msg: String, f: When<G, W>.()->Unit) = THEN(StyledString(msg), f)
+    open fun THEN(msg: StyledString, f: When<G, W>.()->Unit): When<G, W> {
+        logEvaluator.THEN(msg, this, f)
+        return this
+    }
 }
+
+fun<G: Any, W> When<G,*>.AND(msg: String, f: GIVEN<G>.()->W): When<G,W> {
+    val given = GIVEN("", this.given)
+
+    return When(
+        given.given,
+        logEvaluator.WHEN(StyledString(msg), given, f)
+    )
+}
+
 fun<W> WHEN(f: GIVEN<String>.()->W) = WHEN("", f)
 fun<W> WHEN(msg: String, f: GIVEN<String>.()->W) = WHEN(StyledString(msg), f)
 fun<W> WHEN(msg: StyledString, f: GIVEN<String>.()->W): When<String, W> {
     val given = GIVEN { "" }
     return When(
         given.given,
-        log.action(msg, GIVEN.WHEN) {
-            given.f()
-        }
+        logEvaluator.WHEN(msg, given, f)
     )
 }
 

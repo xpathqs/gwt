@@ -24,7 +24,7 @@ package org.xpathqs.gwt
 
 import kotlin.test.assertEquals
 
-class GwtAssertImpl: IGwtAssert {
+internal class GwtAssertImpl: IGwtAssert {
     override fun equals(actual: Any?, expected: Any?) {
         assertEquals(actual, expected)
     }
