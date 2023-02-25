@@ -26,6 +26,9 @@ import kotlin.test.assertEquals
 
 internal class GwtAssertImpl: IGwtAssert {
     override fun equals(actual: Any?, expected: Any?) {
-        assertEquals(actual, expected)
+        assertEquals(
+            expected = expected,
+            actual = actual
+        )
     }
 }
